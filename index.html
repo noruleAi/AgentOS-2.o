@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>AgentOS AI v35 – All Features</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand"><span>🖥️ AgentOS AI</span></div>
+      <button class="close-btn" onclick="toggleSidebar()">✕</button>
+    </div>
+    <div class="search-area"><input type="text" id="searchChat" placeholder="Search..."></div>
+    <button class="new-chat-btn" onclick="newChat()"><i class="fa-solid fa-pen"></i> New Chat</button>
+    <div class="settings-panel">
+      <div class="setting-item" onclick="toggleMemory()">🧠 Memory <span id="memoryStatus">ON</span></div>
+      <div class="setting-item" onclick="toggleAutoSave()">💾 Auto Save <span id="saveStatus">ON</span></div>
+      <div class="setting-item" onclick="toggleTheme()">🎨 Theme <span id="themeStatus">Dark</span></div>
+      <div class="setting-item" onclick="toggleAutoName()">✏ Auto‑Name <span id="autoNameStatus">ON</span></div>
+      <div class="setting-item" onclick="viewLearningData()">📚 Self‑Learning</div>
+      <div class="setting-item" onclick="viewThreatLog()">🛡️ Threat Log</div>
+      <div class="setting-item" onclick="showLoginPanel()">👤 Account: <span id="accountStatus">Guest</span></div>
+      <div class="setting-item">
+        🌐 Language:
+        <select id="langSelectGlobal" onchange="changeLanguage(this.value)" style="background:#1e293b;color:white;border:none;border-radius:4px;padding:2px 4px;font-size:12px;">
+          <option value="en">English</option><option value="hi">हिन्दी</option><option value="mr">मराठी</option>
+          <option value="bn">বাংলা</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option>
+          <option value="gu">ગુજરાતી</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option>
+          <option value="pa">ਪੰਜਾਬੀ</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option>
+          <option value="ur">اردو</option><option value="sa">संस्कृत</option>
+          <option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="zh">中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="ar">العربية</option><option value="pt">Português</option><option value="ru">Русский</option><option value="tr">Türkçe</option><option value="id">Bahasa Indonesia</option>
+        </select>
+      </div>
+      <div class="setting-item" onclick="toggleVoice()">🔊 Voice <span id="voiceStatus">ON</span></div>
+    </div>
+    <div id="founderPanel" class="founder-panel">
+      <h3 class="section-title">👑 Founder Controls</h3>
+      <button class="founder-btn" onclick="listAllUsers()">📋 List Users</button>
+      <button class="founder-btn" onclick="banUser()">🚫 Ban User</button>
+      <button class="founder-btn" onclick="suspendUser()">⏸️ Suspend User</button>
+      <button class="founder-btn" onclick="unbanUser()">✅ Unban/Activate</button>
+    </div>
+    <h3 class="section-title">📌 Pinned</h3><div id="pinnedChats"></div>
+    <h3 class="section-title">💬 Recent</h3><div id="chatList"></div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <div class="main-container">
+    <div class="topbar">
+      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+      <div class="logo"><span>🖥️ AgentOS AI v35</span></div>
+      <div class="top-actions">
+        <button class="top-btn" onclick="exportChats()"><i class="fa-solid fa-download"></i></button>
+        <button class="top-btn" onclick="importChats()"><i class="fa-solid fa-upload"></i></button>
+        <button class="top-btn" onclick="openSettings()"><i class="fa-solid fa-sliders"></i></button>
+      </div>
+    </div>
+
+    <!-- MODE BAR -->
+    <div class="mode-bar" id="modeBar">
+      <button class="mode-btn active" data-mode="chat" onclick="switchMode('chat',this)">💬 Chat</button>
+      <button class="mode-btn" data-mode="code" onclick="switchMode('code',this)">💻 Code</button>
+      <button class="mode-btn" data-mode="build" onclick="switchMode('build',this)">🏗️ Build</button>
+      <button class="mode-btn" data-mode="hacking" onclick="switchMode('hacking',this)">👨‍💻 Hack</button>
+      <button class="mode-btn" data-mode="agent" onclick="switchMode('agent',this)">🤖 Agent</button>
+      <button class="mode-btn" data-mode="bugscanner" onclick="switchMode('bugscanner',this)">🐛 Bugs</button>
+      <button class="mode-btn" data-mode="webanalyzer" onclick="switchMode('webanalyzer',this)">🌐 Web</button>
+      <button class="mode-btn" data-mode="videoanalyzer" onclick="switchMode('videoanalyzer',this)">🎥 Video</button>
+      <button class="mode-btn" data-mode="facesearch" onclick="switchMode('facesearch',this)">🔍 Face</button>
+      <button class="mode-btn" data-mode="trading" onclick="switchMode('trading',this)">📈 Trade</button>
+      <button class="mode-btn" data-mode="math" onclick="switchMode('math',this)">📐 Math</button>
+      <button class="mode-btn" data-mode="writer" onclick="switchMode('writer',this)">✍️ Write</button>
+      <button class="mode-btn" data-mode="legal" onclick="switchMode('legal',this)">⚖️ Legal</button>
+      <button class="mode-btn" data-mode="osint" onclick="switchMode('osint',this)">🕵️ OSINT</button>
+      <button class="mode-btn" data-mode="autonomous" onclick="switchMode('autonomous',this)">🧬 Autonomous</button>
+    </div>
+
+    <!-- EXTRA UI PANELS -->
+    <div id="codeModeUI" class="code-mode-ui" style="display:none;">
+      <label>Lang:</label>
+      <select id="langSelect"></select>
+    </div>
+    <div id="webUrlInput" class="code-mode-ui" style="display:none;"><label>URL:</label><input type="url" id="urlInput" placeholder="https://..."></div>
+    <div id="videoInputUI" class="code-mode-ui" style="display:none;"><button id="selectVideoBtn">📁 Video</button><span id="videoFileName"></span></div>
+    <div id="faceSearchUI" class="code-mode-ui" style="display:none;"><button id="selectFaceBtn">📸 Face Photo</button><span id="faceFileName"></span></div>
+    <div id="tradingUI" class="code-mode-ui" style="display:none;"><label>Symbol:</label><input type="text" id="stockSymbol" placeholder="e.g. RELIANCE"></div>
+    <div id="buildUI" class="code-mode-ui" style="display:none;"><label>Project:</label><select id="projectType"><option value="website">Website</option><option value="app">Mobile App</option><option value="game">Game</option><option value="bot">Bot</option><option value="api">REST API</option></select></div>
+
+    <!-- CHAT AREA -->
+    <div id="reply" class="chat-area">
+      <div id="welcomeScreen" class="welcome">
+        <h1>🖥️ AgentOS AI v35</h1>
+        <p>Reliable Vision · No API Key · All Features</p>
+      </div>
+    </div>
+
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+      <div id="activeModel" class="active-chip">GPT-5</div>
+      <div id="activeTool" class="active-chip">No Tool</div>
+      <div id="currentDateTime" class="active-chip" style="background:#2563eb;"></div>
+      <div id="shieldStatus" class="active-chip" style="background:#10b981;">🛡️ Protected</div>
+      <button class="active-chip" onclick="toggleVoice()" id="speechBtn">🔊</button>
+    </div>
+
+    <!-- MODEL ROW -->
+    <div class="model-row">
+      <button class="model-chip active-model" onclick="selectModel('GPT-5',this)">🧠 GPT-5</button>
+      <button class="model-chip" onclick="selectModel('Claude 3.5',this)">🎭 Claude</button>
+      <button class="model-chip" onclick="selectModel('Gemini 1.5 Pro',this)">🌌 Gemini</button>
+      <button class="model-chip" onclick="selectModel('Grok-2',this)">🕶️ Grok</button>
+      <button class="model-chip" onclick="selectModel('Perplexity',this)">🌐 Perplexity</button>
+      <button class="model-chip" onclick="selectModel('Cohere',this)">🔗 Cohere</button>
+      <button class="model-chip" onclick="selectModel('Bedrock',this)">☁️ Bedrock</button>
+      <button class="model-chip" onclick="selectModel('Mistral Large',this)">🌪️ Mistral</button>
+      <button class="model-chip" onclick="selectModel('Copilot',this)">🤝 Copilot</button>
+      <button class="model-chip" onclick="selectModel('Llama 3',this)">🦙 Llama</button>
+      <button class="model-chip" onclick="selectModel('DeepSeek',this)">🐋 DeepSeek</button>
+      <button class="model-chip" onclick="selectModel('Sonar 2',this)">📡 Sonar 2</button>
+    </div>
+
+    <!-- TOOL ROW -->
+    <div class="tool-row">
+      <button class="tool-btn" onclick="selectTool('Thinking',this)">🧠</button>
+      <button class="tool-btn" onclick="selectTool('Web Search',this)">🌐</button>
+      <button class="tool-btn" onclick="selectTool('Deep Research',this)">🔍</button>
+      <button class="tool-btn" onclick="selectTool('Create Image',this)">🎨</button>
+      <button class="tool-btn" onclick="selectTool('Create Video',this)">🎥</button>
+      <button class="tool-btn" onclick="selectTool('Create Music',this)">🎵</button>
+      <button class="tool-btn" onclick="selectTool('Canvas',this)">📄</button>
+      <button class="tool-btn" onclick="selectTool('Tasks',this)">📅</button>
+      <button class="tool-btn" onclick="openAttachmentMenu()">➕</button>
+    </div>
+
+    <!-- ATTACHMENT PREVIEW -->
+    <div id="attachmentPreview" class="attachment-preview-strip"></div>
+
+    <!-- INPUT BAR -->
+    <div class="input-container">
+      <button class="voice-btn" onclick="startVoice()">🎤</button>
+      <input type="text" id="msg" placeholder="Message AgentOS AI...">
+      <button id="stopBtn" class="stop-btn" onclick="stopGeneration()">■</button>
+      <button class="send-btn" onclick="send()">➤</button>
+    </div>
+  </div>
+
+  <!-- HIDDEN INPUTS -->
+  <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
+  <input type="file" id="galleryInput" accept="image/*" multiple hidden>
+  <input type="file" id="fileInput" hidden>
+  <input type="file" id="importInput" accept=".json" hidden>
+  <input type="file" id="videoInput" accept="video/*" hidden>
+  <input type="file" id="faceInput" accept="image/*" multiple hidden>
+
+  <!-- ATTACHMENT MENU -->
+  <div id="attachmentMenu" class="attachment-menu">
+    <div class="attachment-content"><h2>Tools</h2>
+      <div class="attachment-item" onclick="openCamera()">📷 Camera</div>
+      <div class="attachment-item" onclick="openGallery()">🖼 Gallery</div>
+      <div class="attachment-item" onclick="openFiles()">📁 File Upload</div>
+      <div class="attachment-item" onclick="openFaceSearch()">🔍 Face Search</div>
+      <div class="attachment-item" onclick="exportChats()">💾 Export</div>
+      <div class="attachment-item" onclick="importChats()">📥 Import</div>
+      <div class="attachment-item" onclick="closeAttachmentMenu()">❌ Close</div>
+    </div>
+  </div>
+
+  <!-- CHAT CONTEXT MENU -->
+  <div id="chatMenu" class="chat-menu"><div onclick="pinChat()">📌 Pin</div><div onclick="renameChat()">✏ Rename</div><div onclick="deleteChat()">🗑 Delete</div></div>
+  <div id="typingIndicator" class="typing-indicator" style="display:none;"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

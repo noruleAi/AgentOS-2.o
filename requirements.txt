@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+python-dotenv
+httpx
+asyncpg
+bcrypt
+PyJWT
+slowapi
+aiofiles
+python-multipart
+email-validator
