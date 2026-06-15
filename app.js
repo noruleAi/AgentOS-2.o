@@ -269,17 +269,23 @@ if (result.messages) {
     UI.renderMessages(result.messages);
 }
 
+}   // <-- ADD THIS
+
 // Theme toggle
 function toggleTheme() {
     darkTheme = !darkTheme;
     document.body.classList.toggle("light", !darkTheme);
-    Database.put("settings", { key: "darkTheme", value: darkTheme });
-  }
+    Database.put("settings", {
+        key: "darkTheme",
+        value: darkTheme
+    });
+}
 
   // ... other functions (switchMode, selectModel, etc.)
 
   return { init, sendMessage, toggleTheme };
 })();
 
-// ===================== 7. START =====================
+window.sendMessage = () => App.sendMessage();
+
 window.addEventListener("load", () => App.init());
