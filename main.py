@@ -4,6 +4,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from jose import jwt
 from datetime import datetime, timedelta
+from typing import List
+from uuid import uuid4
 import os
 
 app = FastAPI(title="AgentOS Production API", version="2.0")
