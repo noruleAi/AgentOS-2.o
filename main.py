@@ -1,3 +1,4 @@
+from fastapi.responses import FileResponse
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -66,10 +67,8 @@ def get_current_user(
 
 @app.get("/")
 def root():
-    return {
-        "status": "online",
-        "message": "AgentOS AI v2"
-    }
+    return FileResponse("index.html")
+    
 
 @app.get("/health")
 def health():
