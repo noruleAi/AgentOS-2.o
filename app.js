@@ -269,8 +269,6 @@ if (result.messages) {
     UI.renderMessages(result.messages);
 }
 
-}   // <-- ADD THIS
-
 // Theme toggle
 function toggleTheme() {
     darkTheme = !darkTheme;
@@ -287,5 +285,7 @@ function toggleTheme() {
 })();
 
 window.sendMessage = () => App.sendMessage();
+
+console.log("APP LOADED");
 
 window.addEventListener("load", () => App.init());
