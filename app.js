@@ -5,7 +5,7 @@
 
 // ===================== 1. CONFIG =====================
 const CONFIG = {
-  API_BASE: "https://agentos-ai-production.up.railway.app",
+  API_BASE: "https://agentos-2o-production.up.railway.app",
   DB_NAME: "AgentOSDB",
   DB_VERSION: 1,
   FOUNDER_EMAILS: ["rahulkumarmahto2024@gmail.com"],
