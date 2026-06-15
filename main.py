@@ -183,3 +183,17 @@ def add_message(chat_id: str, message: ChatMessage):
         "success": True,
         "messages": chats_db[chat_id]["messages"]
     }
+@app.delete("/api/chats/{chat_id}")
+def delete_chat(chat_id: str):
+
+    if chat_id not in chats_db:
+        raise HTTPException(
+            status_code=404,
+            detail="Chat not found"
+        )
+
+    del chats_db[chat_id]
+
+    return {
+        "success": True
+    }
