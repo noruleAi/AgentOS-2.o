@@ -127,3 +127,24 @@ def login(data: LoginRequest):
 @app.get("/api/me")
 def me(user=Depends(get_current_user)):
     return user
+class ChatCreate(BaseModel):
+    title: str = "New Chat"
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+chats_db = {}
+
+@app.post("/api/chats")
+def create_chat(chat: ChatCreate):
+
+    chat_id = str(uuid4())
+
+    chats_db[chat_id] = {
+        "id": chat_id,
+        "title": chat.title,
+        "messages": []
+    }
+
+    return chats_db[chat_id]
