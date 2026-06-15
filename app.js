@@ -171,7 +171,7 @@ const Chat = (() => {
 // ===================== 5. UI =====================
 const UI = (() => {
   function renderMessages(messages) {
-    const chatArea = document.getElementById("chatArea");
+    const chatArea = document.getElementById("reply");
     chatArea.innerHTML = "";
     messages.forEach(msg => {
       const div = document.createElement("div");
@@ -208,6 +208,7 @@ const UI = (() => {
 
 // ===================== 6. MAIN APP =====================
 const App = (() => {
+  let currentChatId = null;
   let currentMode = "chat";
   let selectedModel = "openai/gpt-3.5-turbo";
   let speechActive = true;
@@ -236,13 +237,16 @@ const App = (() => {
   }
 
   async function sendMessage() {
-    if (!Auth.getUser()) return alert("Please login");
+    alert("SEND CLICKED");
+    // if (!Auth.getUser()) return alert("Please login");
     const input = document.getElementById("msg");
     const text = input.value.trim();
+console.log("TEXT =", text);
     if (!text) return;
     input.value = "";
 
     let chatId = currentChatId;
+console.log("CHAT ID =", chatId);
     if (!chatId) {
       const chat = await Chat.create();
       chatId = chat.id;
@@ -262,7 +266,7 @@ const App = (() => {
     messages.push({ role: "user", content: text });
 
     const result = await Chat.sendMessage(chatId, text);
-
+console.log("RESULT =", result);
 console.log(result);
 
 if (result.messages) {
