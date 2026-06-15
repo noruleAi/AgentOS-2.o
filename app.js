@@ -265,12 +265,14 @@ const App = (() => {
 
 console.log(result);
 alert("Message Saved Successfully");
-      
-     const updatedChat = await Chat.load(chatId);
-UI.renderMessages(updatedChat.messages); 
-       
-  // Theme toggle
-  function toggleTheme() {
+
+const updatedChat = await Chat.load(chatId);
+UI.renderMessages(updatedChat.messages);
+
+}  
+
+// Theme toggle
+function toggleTheme() {
     darkTheme = !darkTheme;
     document.body.classList.toggle("light", !darkTheme);
     Database.put("settings", { key: "darkTheme", value: darkTheme });
