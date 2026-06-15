@@ -1,26 +1,127 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from pydantic import BaseModel
+from jose import jwt
+from datetime import datetime, timedelta
 import os
 
-app = FastAPI(title="AgentOS Production Backend API", version="1.0.0")
+app = FastAPI(title="AgentOS Production API", version="2.0")
 
-# Add CORS Middleware for multi-platform connections
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, lock this down to your React URL
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+SECRET_KEY = os.getenv("SECRET_KEY", "agentos-secret")
+ALGORITHM = "HS256"
+
+security = HTTPBearer()
+
+users = {}
+
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    name: str
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+def create_token(email: str):
+    payload = {
+        "sub": email,
+        "exp": datetime.utcnow() + timedelta(days=7)
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+        email = payload.get("sub")
+
+        if email not in users:
+            raise HTTPException(status_code=401)
+
+        return users[email]
+
+    except:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )
+
 @app.get("/")
-def read_root():
+def root():
     return {
         "status": "online",
-        "message": "Welcome to AgentOS Core AI Engine",
-        "environment": os.getenv("ENVIRONMENT", "production")
+        "message": "AgentOS AI v2"
     }
 
 @app.get("/health")
-def read_health():
-    return {"status": "ok", "service": "fastapi-backend"}
+def health():
+    return {
+        "status": "ok"
+    }
+
+@app.post("/api/register")
+def register(data: RegisterRequest):
+
+    if data.email in users:
+        raise HTTPException(
+            status_code=400,
+            detail="User already exists"
+        )
+
+    users[data.email] = {
+        "email": data.email,
+        "password": data.password,
+        "name": data.name
+    }
+
+    return {
+        "success": True,
+        "message": "User created"
+    }
+
+@app.post("/api/login")
+def login(data: LoginRequest):
+
+    user = users.get(data.email)
+
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials"
+        )
+
+    if user["password"] != data.password:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials"
+        )
+
+    token = create_token(data.email)
+
+    return {
+        "access_token": token,
+        "user": {
+            "email": user["email"],
+            "name": user["name"]
+        }
+    }
+
+@app.get("/api/me")
+def me(user=Depends(get_current_user)):
+    return user
