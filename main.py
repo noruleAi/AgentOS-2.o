@@ -153,3 +153,33 @@ def create_chat(chat: ChatCreate):
 @app.get("/api/chats")
 def get_chats():
     return list(chats_db.values())
+@app.get("/api/chats/{chat_id}")
+def get_chat(chat_id: str):
+
+    if chat_id not in chats_db:
+        raise HTTPException(
+            status_code=404,
+            detail="Chat not found"
+        )
+
+    return chats_db[chat_id]
+
+
+@app.post("/api/chats/{chat_id}/message")
+def add_message(chat_id: str, message: ChatMessage):
+
+    if chat_id not in chats_db:
+        raise HTTPException(
+            status_code=404,
+            detail="Chat not found"
+        )
+
+    chats_db[chat_id]["messages"].append({
+        "role": message.role,
+        "content": message.content
+    })
+
+    return {
+        "success": True,
+        "messages": chats_db[chat_id]["messages"]
+    }
