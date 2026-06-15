@@ -264,12 +264,10 @@ const App = (() => {
     const result = await Chat.sendMessage(chatId, text);
 
 console.log(result);
-alert("Message Saved Successfully");
 
-const updatedChat = await Chat.load(chatId);
-UI.renderMessages(updatedChat.messages);
-
-}  
+if (result.messages) {
+    UI.renderMessages(result.messages);
+}
 
 // Theme toggle
 function toggleTheme() {
