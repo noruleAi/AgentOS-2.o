@@ -139,14 +139,24 @@ const Chat = (() => {
     return res.ok ? await res.json() : null;
   }
 
-  async function sendMessage(chatId, messages, model) {
-    const response = await fetch(`${CONFIG.API_BASE}/api/chat/stream`, {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${Auth.getToken()}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, messages, model })
-    });
-    return response.body;
-  }
+  async function sendMessage(chatId, text) {
+
+    const res = await fetch(
+        `${CONFIG.API_BASE}/api/chats/${chatId}/message`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                role: "user",
+                content: text
+            })
+        }
+    );
+
+    return await res.json();
+}
 
   async function deleteChat(chatId) {
     await fetch(`${CONFIG.API_BASE}/api/chats/${chatId}`, {
@@ -251,41 +261,14 @@ const App = (() => {
     const messages = chat.messages.map(m => ({ role: m.role, content: m.content }));
     messages.push({ role: "user", content: text });
 
-    // Stream response
-    const stream = await Chat.sendMessage(chatId, messages, selectedModel);
-    const reader = stream.getReader();
-    const decoder = new TextDecoder();
-    let assistantContent = "";
-    const assistantDiv = document.createElement("div");
-    assistantDiv.className = "message assistant-msg";
-    document.getElementById("chatArea").appendChild(assistantDiv);
+    const result = await Chat.sendMessage(chatId, text);
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      const chunk = decoder.decode(value);
-      const lines = chunk.split("\n");
-      for (const line of lines) {
-        if (line.startsWith("data: ")) {
-          const data = line.slice(6);
-          if (data === "[DONE]") continue;
-          try {
-            const parsed = JSON.parse(data);
-            if (parsed.content) {
-              assistantContent += parsed.content;
-              assistantDiv.innerHTML = DOMPurify.sanitize(assistantContent.replace(/\n/g, "<br>"));
-              document.getElementById("chatArea").scrollTop = document.getElementById("chatArea").scrollHeight;
-            }
-          } catch (e) {}
-        }
-      }
-    }
-
-    // After stream completes, reload chat to get full history (or update locally)
-    const updatedChat = await Chat.load(chatId);
-    UI.renderMessages(updatedChat.messages);
-  }
-
+console.log(result);
+alert("Message Saved Successfully");
+      
+     const updatedChat = await Chat.load(chatId);
+UI.renderMessages(updatedChat.messages); 
+       
   // Theme toggle
   function toggleTheme() {
     darkTheme = !darkTheme;
