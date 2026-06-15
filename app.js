@@ -269,6 +269,8 @@ if (result.messages) {
     UI.renderMessages(result.messages);
 }
 
+} // <-- CLOSE sendMessage() HERE
+
 // Theme toggle
 function toggleTheme() {
     darkTheme = !darkTheme;
