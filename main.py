@@ -148,3 +148,8 @@ def create_chat(chat: ChatCreate):
     }
 
     return chats_db[chat_id]
+
+
+@app.get("/api/chats")
+def get_chats():
+    return list(chats_db.values())
