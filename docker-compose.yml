@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # ================================================
+  # Persistent PostgreSQL database
+  # ================================================
+  database:
+    image: postgres:15-alpine
+    container_name: agentos-postgres-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-agentuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-SecureProdPass123!}
+      POSTGRES_DB: ${POSTGRES_DB:-agentos_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agentuser} -d ${POSTGRES_DB:-agentos_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ================================================
+  # FastAPI high-performance Backend API
+  # ================================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: agentos-backend-prod
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - PORT=8000
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-agentuser}:${POSTGRES_PASSWORD:-SecureProdPass123!}@database:5432/${POSTGRES_DB:-agentos_db}?sslmode=disable
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ================================================
+  # React Production Frontend (Served via Custom Nginx)
+  # ================================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: agentos-frontend-prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - app_network
+
+# ================================================
+# Volumes and network mappings
+# ================================================
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  app_network:
+    driver: bridge

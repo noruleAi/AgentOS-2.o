@@ -1,0 +1,8 @@
+{
+  "name": "Remix: AgentOS AI",
+  "description": "A complete production-ready ChatGPT-style AI assistant platform featuring authentication simulation, model switches, long-term memory management, and an admin Founder console.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
