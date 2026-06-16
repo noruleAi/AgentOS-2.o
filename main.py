@@ -49,17 +49,16 @@ app.add_middleware(
 
 # ========================= STATIC FILES =========================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# Look for frontend in the same directory as main.py or one level up
-FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
-if not os.path.exists(FRONTEND_DIR):
-    FRONTEND_DIR = os.path.join(BASE_DIR, "..", "frontend")
-IMAGES_DIR = os.path.join(BASE_DIR, "..", "images")
-if not os.path.exists(IMAGES_DIR):
-    IMAGES_DIR = os.path.join(BASE_DIR, "images")
 
-# Mount static files if they exist
-if os.path.exists(FRONTEND_DIR):
-    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+# Frontend files are in the root directory
+FRONTEND_DIR = BASE_DIR
+
+IMAGES_DIR = os.path.join(BASE_DIR, "images")
+
+# Serve all frontend files
+app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+
+# Optional images folder
 if os.path.exists(IMAGES_DIR):
     app.mount("/images", StaticFiles(directory=IMAGES_DIR), name="images")
 
@@ -122,10 +121,7 @@ async def startup():
 # ========================= ROOT & HEALTH =========================
 @app.get("/")
 def root():
-    index_path = os.path.join(FRONTEND_DIR, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    return {"message": "AgentOS AI 2.0 API is running. Frontend not found."}
+    return FileResponse(os.path.join(BASE_DIR, "index.html"))
 
 @app.get("/health")
 def health():
