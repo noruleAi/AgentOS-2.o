@@ -50,10 +50,8 @@ app.add_middleware(
 
 # ========================= STATIC FILES =========================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
 # Frontend files are in the root directory
 FRONTEND_DIR = BASE_DIR
-
 IMAGES_DIR = os.path.join(BASE_DIR, "images")
 
 # Serve all frontend files
@@ -117,6 +115,7 @@ async def startup():
     logger.info(f"FRONTEND_DIR: {FRONTEND_DIR} – exists: {os.path.exists(FRONTEND_DIR)}")
     logger.info(f"IMAGES_DIR: {IMAGES_DIR} – exists: {os.path.exists(IMAGES_DIR)}")
     logger.info(f"OPENROUTER_API_KEY configured: {bool(OPENROUTER_API_KEY)}")
+    logger.info(f"GEMINI_API_KEY configured: {bool(GEMINI_API_KEY)}")
     logger.info(f"FOUNDER_EMAILS: {FOUNDER_EMAILS}")
 
 # ========================= ROOT & HEALTH =========================
@@ -311,6 +310,7 @@ async def stream_gemini(messages: list):
     except Exception as e:
         yield f"data: {json.dumps({'content': str(e)})}\n\n"
         yield "data: [DONE]\n\n"
+
 async def stream_openrouter(messages: list, model_display: str, user_email: str):
     if not OPENROUTER_API_KEY:
         yield f"data: {json.dumps({'content': 'Error: OpenRouter API key not configured.'})}\n\n"
@@ -405,19 +405,17 @@ async def stream_chat(req: ChatStreamRequest, current_user = Depends(get_current
             except:
                 pass
 
-                async def generate():
-                    accumulated_response = ""
+    async def generate():
+        accumulated_response = ""
 
-                    if GEMINI_API_KEY:
-                        response_stream =                        
-            stream_gemini(req.messages)
-                    else:
-                        response_stream =        
-            stream_openrouter(
-                            req.messages,
-                            req.model,
-                        current_user["email"]
-                    )
+        if GEMINI_API_KEY:
+            response_stream = stream_gemini(req.messages)
+        else:
+            response_stream = stream_openrouter(
+                req.messages,
+                req.model,
+                current_user["email"]
+            )
 
         async for chunk in response_stream:
             if chunk.startswith("data: [DONE]"):
@@ -443,7 +441,7 @@ async def stream_chat(req: ChatStreamRequest, current_user = Depends(get_current
 
     return StreamingResponse(
         generate(),
-        media_type="text/event-stream",
+        media_type="text/event-stream"
     )
 
 # ========================= PUBLIC SIMPLE CHAT (no auth) =========================
@@ -544,7 +542,7 @@ def generate_image(req: ImageGenRequest, current_user = Depends(get_current_user
     url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(req.prompt)}?width={req.width}&height={req.height}&seed={secrets.randbelow(10000)}&nofeed=true"
     return {"url": url}
 
-# ========================= FILE UPLOAD (public? keeping it simple) =========================
+# ========================= FILE UPLOAD (public) =========================
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
     content = await file.read()
