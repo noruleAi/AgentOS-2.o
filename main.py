@@ -11,6 +11,7 @@ import httpx
 
 # ========================= CONFIGURATION =========================
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 SECRET_KEY = os.getenv("SECRET_KEY", "agentos-secret-change-me")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_DAYS = 7
