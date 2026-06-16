@@ -35,13 +35,30 @@ const Database = (() => {
     });
   }
 
-  async function get(store, key) { /* ... */ }
-  async function put(store, value) { /* ... */ }
-  async function del(store, key) { /* ... */ }
-  async function getAll(store) { /* ... */ }
+  async function open() {
+   ...
+}
 
-  return { open, get, put, del, getAll };
+async function get(store, key) {
+  return null;
+}
+
+async function put(store, value) {
+  return true;
+}
+
+async function del(store, key) {
+  return true;
+}
+
+async function getAll(store) {
+  return [];
+}
+
+return { open, get, put, del, getAll };
 })();
+
+  
 
 // ===================== 3. AUTH =====================
 const Auth = (() => {
