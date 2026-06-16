@@ -1,12 +1,12 @@
 /**************************************************************
- *  AgentOS AI v35 – Production Frontend (Final)
+ *  AgentOS AI v35 – Production Frontend (Final Fixed)
  **************************************************************/
 
 const CONFIG = {
   API_BASE: "https://agentos-2o-production-a21a.up.railway.app",
   DB_NAME: "AgentOSDB",
   DB_VERSION: 1,
-  FOUNDER_EMAILS: ["rahulkumarmahto2024@gmail.com"],   // compared in lowercase
+  FOUNDER_EMAILS: ["rahulkumarmahto2024@gmail.com"],
   ALL_LANGUAGES: [
     "Python","JavaScript","TypeScript","Java","C","C++","C#","Go","Rust","Swift",
     "Kotlin","Dart","PHP","Ruby","Perl","R","MATLAB","Scala","Haskell","Elixir",
@@ -291,8 +291,6 @@ window.loadChat = async function(chatId) {
     alert("Error loading chat: " + e.message);
   }
 };
-
-// Safe delete – works both from context menu and list
 window.deleteChat = async function(chatId) {
   chatId = chatId || Chat.currentChatId;
   if (!chatId) return;
@@ -301,7 +299,8 @@ window.deleteChat = async function(chatId) {
     await Chat.deleteChat(chatId);
     if (Chat.currentChatId === chatId) {
       Chat.currentChatId = null;
-      document.getElementById("reply").innerHTML = '<div class="welcome"><h1>AgentOS AI</h1></div>';
+      const replyEl = document.getElementById("reply");
+      if (replyEl) replyEl.innerHTML = '<div class="welcome"><h1>AgentOS AI</h1></div>';
     }
     Chat.loadAll().then(chats => UI.renderChatList(chats));
   } catch (e) {
@@ -321,40 +320,54 @@ window.toggleAutoName = function() {};
 window.viewLearningData = function() { alert("Not implemented"); };
 window.viewThreatLog = function() { alert("Not implemented"); };
 
+// Updated login panel – uses modal
 window.showLoginPanel = function() {
-  if (Auth.getUser()) {
-    // Already logged in – offer logout
-    if (confirm(`Logged in as ${Auth.getUser().name}. Logout?`)) {
-      Auth.logout();
-    }
-    return;
-  }
-  const action = prompt("Type 'login' or 'register' (or cancel):");
-  if (!action) return;
-  const email = prompt("Email:");
-  if (!email) return;
-  const password = prompt("Password:");
-  if (!password) return;
-  if (action === "register") {
-    const name = prompt("Your name:");
-    Auth.register(email, password, name).then(() => {
-      alert("Registered! Now login.");
-    }).catch(e => alert(e.message));
-  } else if (action === "login") {
-    Auth.login(email, password).then(user => {
-      alert(`Welcome ${user.name}!`);
-      Chat.loadAll().then(chats => UI.renderChatList(chats));
-    }).catch(e => alert(e.message));
-  }
+  const modal = document.getElementById("loginModal");
+  if (modal) modal.classList.remove("hidden");
+};
+window.closeLoginModal = function() {
+  const modal = document.getElementById("loginModal");
+  if (modal) modal.classList.add("hidden");
+};
+window.doLogin = async function() {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  if (!email || !password) return alert("Please fill email and password");
+  try {
+    await Auth.login(email, password);
+    window.closeLoginModal();
+    Chat.loadAll().then(chats => UI.renderChatList(chats));
+  } catch (e) { alert(e.message); }
+};
+window.doRegister = async function() {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  const name = document.getElementById("loginName").value.trim() || email.split("@")[0];
+  if (!email || !password) return alert("Please fill email and password");
+  try {
+    await Auth.register(email, password, name);
+    alert("Registered! Now log in.");
+  } catch (e) { alert(e.message); }
 };
 
 window.toggleVoice = function() {};
-window.changeLanguage = function(lang) {};
+window.changeLanguage = function(lang) {
+  // Simple language placeholder
+};
 window.listAllUsers = function() { alert("Admin only"); };
 window.banUser = function() { alert("Admin only"); };
 window.suspendUser = function() { alert("Admin only"); };
 window.unbanUser = function() { alert("Admin only"); };
-window.startVoice = function() {};
+window.startVoice = function() {
+  const rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!rec) return alert("Voice not supported");
+  const recognition = new rec();
+  recognition.lang = "en-US";
+  recognition.onresult = (e) => {
+    document.getElementById("msg").value = e.results[0][0].transcript;
+  };
+  recognition.start();
+};
 window.stopGeneration = function() {};
 window.openAttachmentMenu = function() {
   document.getElementById("attachmentMenu").classList.toggle("active");
@@ -373,6 +386,13 @@ window.exportChats = function() { alert("Export coming soon"); };
 window.importChats = function() { document.getElementById("importInput").click(); };
 window.pinChat = function() { alert("Pin not yet implemented"); };
 window.renameChat = function() { alert("Rename not yet implemented"); };
+
+// Tool selection
+window.selectTool = function(tool, btn) {
+  document.querySelectorAll(".tool-btn").forEach(b => b.classList.remove("active-tool"));
+  btn.classList.add("active-tool");
+  document.getElementById("activeTool").textContent = tool;
+};
 
 // ===================== Mode & Model Switching =====================
 window.switchMode = function(mode, btn) {
@@ -408,8 +428,7 @@ window.switchMode = function(mode, btn) {
   if (mode === "build") document.getElementById("buildUI").style.display = "flex";
 };
 
-// FIXED: update the internal selectedModel variable
-let selectedModel = "GPT-5";
+let selectedModel = "GPT-4o";
 window.selectModel = function(model, btn) {
   selectedModel = model;
   document.querySelectorAll(".model-chip").forEach(b => b.classList.remove("active-model"));
@@ -429,17 +448,31 @@ const App = (() => {
         UI.renderChatList(chats);
       } catch (e) { console.error(e); }
     }
-    document.getElementById("msg").addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
+    const msgInput = document.getElementById("msg");
+    if (msgInput) {
+      msgInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+    }
+    // Populate code languages dropdown
+    const langSelect = document.getElementById("langSelect");
+    if (langSelect) {
+      CONFIG.ALL_LANGUAGES.forEach(lang => {
+        const opt = document.createElement("option");
+        opt.value = lang;
+        opt.textContent = lang;
+        langSelect.appendChild(opt);
+      });
+    }
   }
 
   async function sendMessage() {
     if (!Auth.getToken()) return alert("Please login first.");
     const input = document.getElementById("msg");
+    if (!input) return;
     const text = input.value.trim();
     if (!text) return;
     input.value = "";
@@ -457,12 +490,13 @@ const App = (() => {
       }
     }
 
-    const chatArea = document.getElementById("reply");
+    const replyEl = document.getElementById("reply");
+    if (!replyEl) return;
     const userDiv = document.createElement("div");
     userDiv.className = "message user-msg";
     userDiv.textContent = text;
-    chatArea.appendChild(userDiv);
-    chatArea.scrollTop = chatArea.scrollHeight;
+    replyEl.appendChild(userDiv);
+    replyEl.scrollTop = replyEl.scrollHeight;
 
     try {
       const chat = await Chat.load(chatId);
@@ -471,13 +505,14 @@ const App = (() => {
       messages.push({ role: "user", content: text });
 
       const modelMap = {
+        "GPT-4o": "openai/gpt-4o",
         "GPT-5": "openai/gpt-4o",
         "Claude 3.5": "anthropic/claude-sonnet-4-20250514",
         "Gemini 1.5 Pro": "google/gemini-1.5-pro",
         "DeepSeek": "deepseek/deepseek-chat",
         "Llama 3": "meta-llama/llama-3.3-70b-instruct"
       };
-      const modelId = modelMap[selectedModel] || selectedModel;
+      const modelId = modelMap[selectedModel] || "openai/gpt-4o";
 
       const stream = await Chat.streamChat(chatId, messages, modelId);
       const reader = stream.getReader();
@@ -485,7 +520,7 @@ const App = (() => {
       let assistantContent = "";
       const assistantDiv = document.createElement("div");
       assistantDiv.className = "message assistant-msg";
-      chatArea.appendChild(assistantDiv);
+      replyEl.appendChild(assistantDiv);
 
       while (true) {
         const { done, value } = await reader.read();
@@ -500,13 +535,12 @@ const App = (() => {
               const parsed = JSON.parse(data);
               if (parsed.content) {
                 assistantContent += parsed.content;
-                // Safe rendering – DOMPurify fallback
                 if (window.DOMPurify) {
                   assistantDiv.innerHTML = DOMPurify.sanitize(assistantContent.replace(/\n/g, "<br>"), { ALLOWED_TAGS: ["b","i","strong","em","pre","code","span","br"], ALLOWED_ATTR: ["class"] });
                 } else {
                   assistantDiv.textContent = assistantContent;
                 }
-                chatArea.scrollTop = chatArea.scrollHeight;
+                replyEl.scrollTop = replyEl.scrollHeight;
               }
             } catch(e) {}
           }
