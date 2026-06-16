@@ -255,7 +255,7 @@ def add_message(chat_id: str, msg: ChatMessage, current_user = Depends(get_curre
 MODEL_MAP = {
     "GPT-4o": "openai/gpt-4o",
     "Claude 3.5": "anthropic/claude-sonnet-4-20250514",
-    "Gemini 1.5 Pro": "google/gemini-1.5-pro",
+    "gemini-1.5-flash": "google/gemini-1.5-pro",
     "DeepSeek": "deepseek/deepseek-chat",
     "Llama 3": "meta-llama/llama-3.3-70b-instruct",
     "Mistral Large": "mistralai/mistral-large",
