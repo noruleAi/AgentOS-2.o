@@ -267,7 +267,7 @@ MODEL_MAP = {
     "Sonar 2": "perplexity/sonar-reasoning"
 }
 
-  async def stream_gemini(messages: list):
+async def stream_gemini(messages: list):
     if not GEMINI_API_KEY:
         yield f"data: {json.dumps({'content':'Gemini API key not configured'})}\n\n"
         yield "data: [DONE]\n\n"
@@ -405,17 +405,19 @@ async def stream_chat(req: ChatStreamRequest, current_user = Depends(get_current
             except:
                 pass
 
-async def generate():
-        accumulated_response = ""
+                async def generate():
+                    accumulated_response = ""
 
-        if GEMINI_API_KEY:
-            response_stream = stream_gemini(req.messages)
-        else:
-            response_stream = stream_openrouter(
-                req.messages,
-                req.model,
-                current_user["email"]
-            )
+                    if GEMINI_API_KEY:
+                        response_stream =                        
+            stream_gemini(req.messages)
+                    else:
+                        response_stream =        
+            stream_openrouter(
+                            req.messages,
+                            req.model,
+                        current_user["email"]
+                    )
 
         async for chunk in response_stream:
             if chunk.startswith("data: [DONE]"):
