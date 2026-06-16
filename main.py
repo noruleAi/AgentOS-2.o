@@ -267,7 +267,7 @@ MODEL_MAP = {
     "Sonar 2": "perplexity/sonar-reasoning"
 }
 
- async def stream_gemini(messages: list):
+  async def stream_gemini(messages: list):
     if not GEMINI_API_KEY:
         yield f"data: {json.dumps({'content':'Gemini API key not configured'})}\n\n"
         yield "data: [DONE]\n\n"
