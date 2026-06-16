@@ -406,40 +406,43 @@ async def stream_chat(req: ChatStreamRequest, current_user = Depends(get_current
                 pass
 
 async def generate():
-    full_response = ""
+        accumulated_response = ""
 
-    if GEMINI_API_KEY:
-        generator =   
-stream_gemini(req.messages)
-else:
-    generator = stream_openrouter(
-            req.messages,   
-            req.model,
-            current_user["email"]
-        )
+        if GEMINI_API_KEY:
+            response_stream = stream_gemini(req.messages)
+        else:
+            response_stream = stream_openrouter(
+                req.messages,
+                req.model,
+                current_user["email"]
+            )
 
-    async for chunk in generator:
-        if chunk.startswith("data: [DONE]"):
-            break
+        async for chunk in response_stream:
+            if chunk.startswith("data: [DONE]"):
+                break
 
-        yield chunk
+            yield chunk
 
-        try:
-                
-data = json.loads(chunk.replace("data: ","")) 
-    full_response += data.get("content", "")
-        except:
-            pass
+            try:
+                payload = json.loads(chunk.replace("data: ", ""))
+                accumulated_response += payload.get("content", "")
+            except Exception:
+                continue
 
-    if full_response:
-        chat["messages"].append({
-            "role": "assistant",
-            "content": full_response
-        })
+        if accumulated_response:
+            chat["messages"].append(
+                {
+                    "role": "assistant",
+                    "content": accumulated_response,
+                }
+            )
 
-    yield "data: [DONE]\n\n"
+        yield "data: [DONE]\n\n"
 
-    return StreamingResponse(generate(), media_type="text/event-stream")
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+    )
 
 # ========================= PUBLIC SIMPLE CHAT (no auth) =========================
 class SimpleChatRequest(BaseModel):
