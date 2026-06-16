@@ -266,7 +266,50 @@ MODEL_MAP = {
     "Copilot": "microsoft/copilot",
     "Sonar 2": "perplexity/sonar-reasoning"
 }
+ async def stream_gemini(messages: list):
+    if not GEMINI_API_KEY:
+        yield f"data: {json.dumps({'content':'Gemini API key not configured'})}\n\n"
+        yield "data: [DONE]\n\n"
+        return
 
+    try:
+        prompt = "\n".join(
+            [f"{m.get('role','user')}: {m.get('content','')}" for m in messages]
+        )
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key={GEMINI_API_KEY}",
+                json={
+                    "contents": [
+                        {
+                            "parts": [
+                                {"text": prompt}
+                            ]
+                        }
+                    ]
+                },
+                timeout=60.0
+            )
+
+            if response.status_code != 200:
+                yield f"data: {json.dumps({'content':f'Gemini Error {response.status_code}'})}\n\n"
+                yield "data: [DONE]\n\n"
+                return
+
+            data = response.json()
+
+            text = (
+                data["candidates"][0]
+                ["content"]["parts"][0]["text"]
+            )
+
+            yield f"data: {json.dumps({'content': text})}\n\n"
+            yield "data: [DONE]\n\n"
+
+    except Exception as e:
+        yield f"data: {json.dumps({'content': str(e)})}\n\n"
+        yield "data: [DONE]\n\n"
 async def stream_openrouter(messages: list, model_display: str, user_email: str):
     if not OPENROUTER_API_KEY:
         yield f"data: {json.dumps({'content': 'Error: OpenRouter API key not configured.'})}\n\n"
@@ -362,11 +405,22 @@ async def stream_chat(req: ChatStreamRequest, current_user = Depends(get_current
                 pass
 
     async def generate():
-        full_response = ""
-        async for chunk in stream_openrouter(req.messages, req.model, current_user["email"]):
-            if chunk.startswith("data: [DONE]"):
-                break
-            yield chunk
+    full_response = ""
+
+    if GEMINI_API_KEY:
+        generator = stream_gemini(req.messages)
+    else:
+        generator = stream_openrouter(
+            req.messages,
+            req.model,
+            current_user["email"]
+        )
+
+    async for chunk in generator:
+        if chunk.startswith("data: [DONE]"):
+            break
+
+        yield chunk
             try:
                 data = json.loads(chunk.replace("data: ", ""))
                 full_response += data.get("content", "")
