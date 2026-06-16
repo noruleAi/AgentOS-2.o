@@ -91,8 +91,8 @@
     <div id="tradingUI" class="code-mode-ui" style="display:none;"><label>Symbol:</label><input type="text" id="stockSymbol" placeholder="e.g. RELIANCE"></div>
     <div id="buildUI" class="code-mode-ui" style="display:none;"><label>Project:</label><select id="projectType"><option value="website">Website</option><option value="app">Mobile App</option><option value="game">Game</option><option value="bot">Bot</option><option value="api">REST API</option></select></div>
 
-    <!-- CHAT AREA (fixed ID) -->
-    <div id="chatArea" class="chat-area">
+    <!-- CHAT AREA (FIXED ID: reply) -->
+    <div id="reply" class="chat-area">
       <div id="welcomeScreen" class="welcome">
         <h1>🖥️ AgentOS AI v35</h1>
         <p>Reliable Vision · No API Key · All Features</p>
@@ -101,7 +101,7 @@
 
     <!-- STATUS BAR -->
     <div class="status-bar">
-      <div id="activeModel" class="active-chip">GPT-5</div>
+      <div id="activeModel" class="active-chip">GPT-4o</div>
       <div id="activeTool" class="active-chip">No Tool</div>
       <div id="currentDateTime" class="active-chip" style="background:#2563eb;"></div>
       <div id="shieldStatus" class="active-chip" style="background:#10b981;">🛡️ Protected</div>
@@ -110,7 +110,7 @@
 
     <!-- MODEL ROW -->
     <div class="model-row">
-      <button class="model-chip active-model" onclick="selectModel('GPT-5',this)">🧠 GPT-5</button>
+      <button class="model-chip active-model" onclick="selectModel('GPT-4o',this)">🧠 GPT-4o</button>
       <button class="model-chip" onclick="selectModel('Claude 3.5',this)">🎭 Claude</button>
       <button class="model-chip" onclick="selectModel('Gemini 1.5 Pro',this)">🌌 Gemini</button>
       <button class="model-chip" onclick="selectModel('Grok-2',this)">🕶️ Grok</button>
@@ -174,13 +174,14 @@
   <div id="chatMenu" class="chat-menu"><div onclick="pinChat()">📌 Pin</div><div onclick="renameChat()">✏ Rename</div><div onclick="deleteChat()">🗑 Delete</div></div>
   <div id="typingIndicator" class="typing-indicator" style="display:none;"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
 
-  <!-- LOGIN MODAL (for showLoginPanel) -->
+  <!-- LOGIN MODAL -->
   <div id="loginModal" class="modal-overlay hidden">
     <div class="modal-container">
       <button class="modal-close" onclick="closeLoginModal()">✕</button>
       <h2>Login / Register</h2>
       <input type="email" id="loginEmail" placeholder="Email">
       <input type="password" id="loginPassword" placeholder="Password">
+      <input type="text" id="loginName" placeholder="Name (for register)">
       <button class="btn-primary" onclick="doLogin()">Login</button>
       <button class="btn-secondary" onclick="doRegister()">Register</button>
     </div>
@@ -193,14 +194,6 @@
         alert('Failed to load app.js. Please check the console for details.');
       }
     }, true);
-
-    // Enter key to send message
-    document.getElementById('msg').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        if (typeof sendMessage === 'function') sendMessage();
-      }
-    });
   </script>
   <script src="/static/app.js"></script>
 </body>
