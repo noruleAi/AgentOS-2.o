@@ -257,7 +257,7 @@ def add_message(chat_id: str, msg: ChatMessage, current_user = Depends(get_curre
 
 # ========================= AI STREAMING (authenticated) =========================
 MODEL_MAP = {
-    "GPT-5": "openai/gpt-4o",
+    "GPT-4o": "openai/gpt-4o",
     "Claude 3.5": "anthropic/claude-sonnet-4-20250514",
     "Gemini 1.5 Pro": "google/gemini-1.5-pro",
     "DeepSeek": "deepseek/deepseek-chat",
