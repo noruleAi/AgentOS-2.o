@@ -266,6 +266,7 @@ MODEL_MAP = {
     "Copilot": "microsoft/copilot",
     "Sonar 2": "perplexity/sonar-reasoning"
 }
+
  async def stream_gemini(messages: list):
     if not GEMINI_API_KEY:
         yield f"data: {json.dumps({'content':'Gemini API key not configured'})}\n\n"
@@ -404,14 +405,15 @@ async def stream_chat(req: ChatStreamRequest, current_user = Depends(get_current
             except:
                 pass
 
-    async def generate():
+async def generate():
     full_response = ""
 
     if GEMINI_API_KEY:
-        generator = stream_gemini(req.messages)
-    else:
-        generator = stream_openrouter(
-            req.messages,
+        generator =   
+stream_gemini(req.messages)
+else:
+    generator = stream_openrouter(
+            req.messages,   
             req.model,
             current_user["email"]
         )
@@ -421,14 +423,21 @@ async def stream_chat(req: ChatStreamRequest, current_user = Depends(get_current
             break
 
         yield chunk
-            try:
-                data = json.loads(chunk.replace("data: ", ""))
-                full_response += data.get("content", "")
-            except:
-                pass
-        if full_response:
-            chat["messages"].append({"role": "assistant", "content": full_response})
-        yield "data: [DONE]\n\n"
+
+        try:
+                
+data = json.loads(chunk.replace("data: ","")) 
+    full_response += data.get("content", "")
+        except:
+            pass
+
+    if full_response:
+        chat["messages"].append({
+            "role": "assistant",
+            "content": full_response
+        })
+
+    yield "data: [DONE]\n\n"
 
     return StreamingResponse(generate(), media_type="text/event-stream")
 
