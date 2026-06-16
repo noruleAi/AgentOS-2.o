@@ -216,8 +216,9 @@ const App = (() => {
 
   async function init() {
     await Database.open();
-    await Auth.restore();
-    updateAuthUI();
+await Auth.restore();
+// updateAuthUI();
+   
 
     // Load chats if logged in
     if (Auth.getUser()) {
