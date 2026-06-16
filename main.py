@@ -255,7 +255,7 @@ def add_message(chat_id: str, msg: ChatMessage, current_user = Depends(get_curre
 MODEL_MAP = {
     "GPT-4o": "openai/gpt-4o",
     "Claude 3.5": "anthropic/claude-sonnet-4-20250514",
-    "gemini-1.5-flash": "google/gemini-1.5-pro",
+    "Gemini 2.0 Flash": "google/gemini-2.0-flash",
     "DeepSeek": "deepseek/deepseek-chat",
     "Llama 3": "meta-llama/llama-3.3-70b-instruct",
     "Mistral Large": "mistralai/mistral-large",
@@ -279,7 +279,7 @@ async def stream_gemini(messages: list):
 
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key={GEMINI_API_KEY}",
+                f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}",
                 json={
                     "contents": [
                         {
