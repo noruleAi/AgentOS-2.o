@@ -103,6 +103,14 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_memory_user ON memory(user_email);
     """)
     conn.execute("DELETE FROM password_resets WHERE expires_at < datetime('now')")
+if messages and messages[-1]["role"]=="user":
+    user_msg = messages[-1]["content"]
+
+    conn.execute(
+        "INSERT INTO messages (chat_id,role,content,created_at) VALUES (?,?,?,?)",
+        (chat_id,"user",user_msg,datetime.datetime.utcnow().isoformat())
+    )
+
     conn.commit()
     conn.close()
 
