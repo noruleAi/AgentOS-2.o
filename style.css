@@ -1,3 +1,4 @@
+/* ========== Reset & Base ========== */
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
 html, body { height:100%; background:#0a0f1f; color:#f0f0f0; overflow:hidden; }
 body.light { background:#f0f4f8; color:#111; }
@@ -16,6 +17,9 @@ body.light input, body.light select { background:#cbd5e1; color:#111; }
 body.light .attachment-menu, body.light .chat-menu, body.light .founder-panel { background:#e2e8f0; color:#111; }
 body.light pre.code-block { background:#e2e8f0; }
 body.light pre.code-block code { color:#111; }
+body.light .file-chip { background:#cbd5e1; color:#111; }
+body.light .modal-container { background:#fff; color:#111; }
+body.light .modal-container input, body.light .modal-container select { background:#e2e8f0; border-color:#ccc; color:#111; }
 
 /* Layout */
 .main-container { display:flex; flex-direction:column; height:100dvh; }
@@ -45,10 +49,14 @@ body.light pre.code-block code { color:#111; }
 .status-bar { display:flex; gap:4px; padding:4px 10px; background:#0f172a; border-bottom:1px solid rgba(255,255,255,0.04); align-items:center; flex-wrap:wrap; height:26px; }
 .active-chip { padding:2px 8px; background:#1e293b; border-radius:999px; font-size:10px; line-height:1; white-space:nowrap; border:none; color:white; }
 
-/* Message styles */
+/* Messages */
 .user-msg, .assistant-msg { padding:12px 14px; border-radius:16px; max-width:85%; word-wrap:break-word; line-height:1.5; font-size:14px; animation:fadeIn 0.2s; }
 .user-msg { background:#2563eb; align-self:flex-end; margin-left:auto; color:white; }
 .assistant-msg { background:#1e293b; align-self:flex-start; color:white; }
+
+/* Loading skeleton */
+.skeleton { background: linear-gradient(90deg, #2a2a3c 25%, #3a3a4c 50%, #2a2a3c 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 12px; height: 60px; margin-bottom: 8px; }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
 .message-actions { display:flex; gap:4px; margin-top:6px; }
 .message-btn { border:none; background:#374151; color:white; padding:3px 8px; border-radius:5px; cursor:pointer; font-size:10px; }
@@ -67,6 +75,7 @@ pre.code-block code { color:#e5e7eb; font-family:'JetBrains Mono',monospace; }
 .img-box { position:relative; flex-shrink:0; }
 .preview-img { width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid #2563eb; }
 .remove-img { position:absolute; top:-4px; right:-4px; width:16px; height:16px; border-radius:50%; background:#ef4444; color:white; font-size:10px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.file-chip { background:#2a2a3c; padding:4px 8px; border-radius:12px; font-size:12px; display:inline-flex; align-items:center; gap:4px; margin:2px; color:white; }
 
 /* Input */
 .input-container { display:flex; align-items:center; gap:4px; padding:5px 8px; background:#121a2b; border-top:1px solid rgba(255,255,255,0.06); height:44px; }
@@ -85,7 +94,7 @@ pre.code-block code { color:#e5e7eb; font-family:'JetBrains Mono',monospace; }
 .chat-menu.show { display:block; }
 .chat-menu div { padding:8px 12px; cursor:pointer; border-radius:5px; font-size:12px; }
 
-/* Typing indicator */
+/* Typing */
 .typing-indicator { display:flex; gap:4px; padding:8px; align-self:flex-start; }
 .dot { width:6px; height:6px; background:#60a5fa; border-radius:50%; animation:bounce 1s infinite; }
 .dot:nth-child(2){ animation-delay:0.2s; } .dot:nth-child(3){ animation-delay:0.4s; }
@@ -101,6 +110,8 @@ pre.code-block code { color:#e5e7eb; font-family:'JetBrains Mono',monospace; }
 .code-mode-ui { display:flex; align-items:center; gap:6px; padding:3px 6px; background:#0f172a; flex-wrap:wrap; height:24px; }
 .code-mode-ui label { font-size:10px; }
 .code-mode-ui select, .code-mode-ui input { padding:2px 6px; border-radius:4px; background:#1e293b; color:white; border:none; outline:none; font-size:12px; }
+#imageGenPanel, #voicePanel, #searchPanel, #cybersecPanel { display:flex; align-items:center; gap:4px; padding:4px 8px; background:#0f172a; }
+#imageGenPanel input, #voicePanel input, #searchPanel input { flex:1; padding:6px 10px; border-radius:8px; background:#1e293b; color:white; border:none; outline:none; font-size:12px; }
 
 /* Founder */
 .founder-panel { padding:8px 10px; background:#1a0a2e; border:1px solid #a855f7; border-radius:8px; margin:6px 10px; display:none; }
@@ -116,12 +127,16 @@ body.light .founder-info { color:#111; }
 /* Modal */
 .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:30000; }
 .modal-overlay.hidden { display:none; }
-.modal-container { background:#1e293b; color:#f0f0f0; padding:24px; border-radius:16px; max-width:90%; width:420px; position:relative; }
+.modal-container { background:#1e293b; color:#f0f0f0; padding:24px; border-radius:16px; max-width:90%; width:420px; position:relative; max-height:80vh; overflow-y:auto; }
 .modal-close { position:absolute; top:8px; right:12px; background:none; border:none; color:#ccc; font-size:20px; cursor:pointer; }
-.modal-container input { width:100%; padding:10px; margin-bottom:12px; border-radius:8px; background:#2a2a3c; border:1px solid #444; color:white; }
-.modal-container button { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; }
+.modal-container h2 { margin-bottom:16px; font-size:20px; }
+.modal-container input, .modal-container select { width:100%; padding:10px; margin-bottom:12px; border-radius:8px; background:#2a2a3c; border:1px solid #444; color:white; font-size:14px; }
+.modal-container button { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-size:14px; }
 .btn-primary { background:#2563eb; color:white; }
 .btn-secondary { background:#374151; color:white; }
+
+/* Toast */
+.toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#10b981; color:white; padding:12px 24px; border-radius:8px; z-index:40000; animation:fadeIn 0.3s; }
 
 @media (max-width:768px) {
   .sidebar { width:280px; }
