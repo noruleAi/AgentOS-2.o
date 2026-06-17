@@ -43,7 +43,7 @@ def verify_password(pw: str, hashed: str) -> bool:
     return pwd_context.verify(pw, hashed)
 
 # ========================= SQLite Database =========================
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "agentos.db")
+DB_PATH = "/data/agentos.db"
 def get_db():
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.row_factory = sqlite3.Row
