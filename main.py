@@ -44,6 +44,7 @@ def verify_password(pw: str, hashed: str) -> bool:
 
 # ========================= SQLite Database =========================
 DB_PATH = "/data/agentos.db"
+os.makedirs("/data", exist_ok=True)
 def get_db():
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.row_factory = sqlite3.Row
