@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>AgentOS AI v35 – All Features</title>
+  <title>AgentOS AI v1 Beta</title>
   <link rel="stylesheet" href="/static/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
@@ -13,21 +13,23 @@
   <div id="sidebar" class="sidebar">
     <div class="sidebar-header">
       <div class="brand"><span>🖥️ AgentOS AI</span></div>
-      <button class="close-btn" onclick="toggleSidebar()">✕</button>
+      <button class="close-btn" onclick="UI.toggleSidebar()">✕</button>
     </div>
-    <div class="search-area"><input type="text" id="searchChat" placeholder="Search..."></div>
-    <button class="new-chat-btn" onclick="newChat()"><i class="fa-solid fa-pen"></i> New Chat</button>
+    <div class="search-area"><input type="text" id="searchChat" placeholder="Search chats..." oninput="UI.searchChats()"></div>
+    <button class="new-chat-btn" onclick="Chat.newChat()"><i class="fa-solid fa-pen"></i> New Chat</button>
     <div class="settings-panel">
-      <div class="setting-item" onclick="toggleMemory()">🧠 Memory <span id="memoryStatus">ON</span></div>
-      <div class="setting-item" onclick="toggleAutoSave()">💾 Auto Save <span id="saveStatus">ON</span></div>
-      <div class="setting-item" onclick="toggleTheme()">🎨 Theme <span id="themeStatus">Dark</span></div>
-      <div class="setting-item" onclick="toggleAutoName()">✏ Auto‑Name <span id="autoNameStatus">ON</span></div>
-      <div class="setting-item" onclick="viewLearningData()">📚 Self‑Learning</div>
-      <div class="setting-item" onclick="viewThreatLog()">🛡️ Threat Log</div>
-      <div class="setting-item" onclick="showLoginPanel()">👤 Account: <span id="accountStatus">Guest</span></div>
+      <div class="setting-item" onclick="Memory.toggleMemory()">🧠 Memory <span id="memoryStatus">ON</span></div>
+      <div class="setting-item" onclick="Settings.toggleAutoSave()">💾 Auto Save <span id="saveStatus">ON</span></div>
+      <div class="setting-item" onclick="App.toggleTheme()">🎨 Theme <span id="themeStatus">Dark</span></div>
+      <div class="setting-item" onclick="Settings.toggleAutoName()">✏ Auto‑Name <span id="autoNameStatus">ON</span></div>
+      <div class="setting-item" onclick="UI.showLoginModal()">👤 Account: <span id="accountStatus">Guest</span></div>
+      <div class="setting-item" onclick="Auth.logout()">🚪 Logout</div>
+      <div class="setting-item" onclick="UI.showSettingsModal()">⚙️ Settings</div>
+      <div class="setting-item" onclick="UI.showMemoryPanel()">🧩 Memory</div>
+      <div class="setting-item" onclick="UI.showProfileModal()">🖼 Profile</div>
       <div class="setting-item">
         🌐 Language:
-        <select id="langSelectGlobal" onchange="changeLanguage(this.value)" style="background:#1e293b;color:white;border:none;border-radius:4px;padding:2px 4px;font-size:12px;">
+        <select id="langSelectGlobal" onchange="App.changeLanguage(this.value)" style="background:#1e293b;color:white;border:none;border-radius:4px;padding:2px 4px;font-size:12px;">
           <option value="en">English</option><option value="hi">हिन्दी</option><option value="mr">मराठी</option>
           <option value="bn">বাংলা</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option>
           <option value="gu">ગુજરાતી</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option>
@@ -36,116 +38,120 @@
           <option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="zh">中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="ar">العربية</option><option value="pt">Português</option><option value="ru">Русский</option><option value="tr">Türkçe</option><option value="id">Bahasa Indonesia</option>
         </select>
       </div>
-      <div class="setting-item" onclick="toggleVoice()">🔊 Voice <span id="voiceStatus">ON</span></div>
+      <div class="setting-item" onclick="Voice.toggleVoice()">🔊 Voice <span id="voiceStatus">ON</span></div>
     </div>
     <div id="founderPanel" class="founder-panel">
       <h3 class="section-title">👑 Founder Controls</h3>
-      <button class="founder-btn" onclick="listAllUsers()">📋 List Users</button>
-      <button class="founder-btn" onclick="banUser()">🚫 Ban User</button>
-      <button class="founder-btn" onclick="suspendUser()">⏸️ Suspend User</button>
-      <button class="founder-btn" onclick="unbanUser()">✅ Unban/Activate</button>
+      <button class="founder-btn" onclick="Admin.listUsers()">📋 List Users</button>
+      <button class="founder-btn" onclick="Admin.banUser()">🚫 Ban User</button>
+      <button class="founder-btn" onclick="Admin.suspendUser()">⏸️ Suspend User</button>
+      <button class="founder-btn" onclick="Admin.unbanUser()">✅ Unban/Activate</button>
+      <button class="founder-btn" onclick="Admin.deleteUser()">❌ Delete User</button>
+      <button class="founder-btn" onclick="Admin.listChats()">💬 View Chats</button>
+      <button class="founder-btn" onclick="Admin.logs()">📜 Logs</button>
+      <button class="founder-btn" onclick="Admin.stats()">📊 Stats</button>
     </div>
     <h3 class="section-title">📌 Pinned</h3><div id="pinnedChats"></div>
     <h3 class="section-title">💬 Recent</h3><div id="chatList"></div>
+    <!-- Founder info -->
+    <div class="founder-info">
+      <img src="/images/rahul.jpg" alt="Founder" onerror="this.style.display='none'">
+      <h3>Rahul Kumar Mahto</h3>
+      <p>Founder & Creator</p>
+      <p>Contact via support</p>
+    </div>
   </div>
 
   <!-- MAIN CONTAINER -->
   <div class="main-container">
     <div class="topbar">
-      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-      <div class="logo"><span>🖥️ AgentOS AI v35</span></div>
+      <button class="menu-btn" onclick="UI.toggleSidebar()">☰</button>
+      <div class="logo"><span>🖥️ AgentOS AI v1</span></div>
       <div class="top-actions">
-        <button class="top-btn" onclick="exportChats()"><i class="fa-solid fa-download"></i></button>
-        <button class="top-btn" onclick="importChats()"><i class="fa-solid fa-upload"></i></button>
-        <button class="top-btn" onclick="openSettings()"><i class="fa-solid fa-sliders"></i></button>
+        <button class="top-btn" onclick="Chat.exportChats()"><i class="fa-solid fa-download"></i></button>
+        <button class="top-btn" onclick="Chat.importChats()"><i class="fa-solid fa-upload"></i></button>
+        <button class="top-btn" onclick="UI.openSettings()"><i class="fa-solid fa-sliders"></i></button>
       </div>
     </div>
 
     <!-- MODE BAR -->
     <div class="mode-bar" id="modeBar">
-      <button class="mode-btn active" data-mode="chat" onclick="switchMode('chat',this)">💬 Chat</button>
-      <button class="mode-btn" data-mode="code" onclick="switchMode('code',this)">💻 Code</button>
-      <button class="mode-btn" data-mode="build" onclick="switchMode('build',this)">🏗️ Build</button>
-      <button class="mode-btn" data-mode="hacking" onclick="switchMode('hacking',this)">👨‍💻 Hack</button>
-      <button class="mode-btn" data-mode="agent" onclick="switchMode('agent',this)">🤖 Agent</button>
-      <button class="mode-btn" data-mode="bugscanner" onclick="switchMode('bugscanner',this)">🐛 Bugs</button>
-      <button class="mode-btn" data-mode="webanalyzer" onclick="switchMode('webanalyzer',this)">🌐 Web</button>
-      <button class="mode-btn" data-mode="videoanalyzer" onclick="switchMode('videoanalyzer',this)">🎥 Video</button>
-      <button class="mode-btn" data-mode="facesearch" onclick="switchMode('facesearch',this)">🔍 Face</button>
-      <button class="mode-btn" data-mode="trading" onclick="switchMode('trading',this)">📈 Trade</button>
-      <button class="mode-btn" data-mode="math" onclick="switchMode('math',this)">📐 Math</button>
-      <button class="mode-btn" data-mode="writer" onclick="switchMode('writer',this)">✍️ Write</button>
-      <button class="mode-btn" data-mode="legal" onclick="switchMode('legal',this)">⚖️ Legal</button>
-      <button class="mode-btn" data-mode="osint" onclick="switchMode('osint',this)">🕵️ OSINT</button>
-      <button class="mode-btn" data-mode="autonomous" onclick="switchMode('autonomous',this)">🧬 Autonomous</button>
+      <button class="mode-btn active" data-mode="chat" onclick="App.switchMode('chat',this)">💬 Chat</button>
+      <button class="mode-btn" data-mode="code" onclick="App.switchMode('code',this)">💻 Code</button>
+      <button class="mode-btn" data-mode="teacher" onclick="App.switchMode('teacher',this)">🧠 Teacher</button>
+      <button class="mode-btn" data-mode="image" onclick="App.switchMode('image',this)">🎨 Image</button>
+      <button class="mode-btn" data-mode="voice" onclick="App.switchMode('voice',this)">🎤 Voice</button>
+      <button class="mode-btn" data-mode="search" onclick="App.switchMode('search',this)">🔍 Search</button>
+      <button class="mode-btn" data-mode="cybersecurity" onclick="App.switchMode('cybersecurity',this)">🛡️ CyberSec</button>
     </div>
 
-    <!-- EXTRA UI PANELS -->
-    <div id="codeModeUI" class="code-mode-ui" style="display:none;">
-      <label>Lang:</label>
-      <select id="langSelect"></select>
+    <!-- Extra panels -->
+    <div id="codeModeUI" class="code-mode-ui" style="display:none;"><label>Lang:</label><select id="langSelect"></select></div>
+    <div id="imageGenPanel" class="code-mode-ui" style="display:none;">
+      <input type="text" id="imagePrompt" placeholder="Describe the image you want...">
+      <button onclick="App.generateImage()">Generate</button>
     </div>
-    <div id="webUrlInput" class="code-mode-ui" style="display:none;"><label>URL:</label><input type="url" id="urlInput" placeholder="https://..."></div>
-    <div id="videoInputUI" class="code-mode-ui" style="display:none;"><button id="selectVideoBtn">📁 Video</button><span id="videoFileName"></span></div>
-    <div id="faceSearchUI" class="code-mode-ui" style="display:none;"><button id="selectFaceBtn">📸 Face Photo</button><span id="faceFileName"></span></div>
-    <div id="tradingUI" class="code-mode-ui" style="display:none;"><label>Symbol:</label><input type="text" id="stockSymbol" placeholder="e.g. RELIANCE"></div>
-    <div id="buildUI" class="code-mode-ui" style="display:none;"><label>Project:</label><select id="projectType"><option value="website">Website</option><option value="app">Mobile App</option><option value="game">Game</option><option value="bot">Bot</option><option value="api">REST API</option></select></div>
+    <div id="voicePanel" class="code-mode-ui" style="display:none;">
+      <button onclick="Voice.startListening()">🎙️ Speak</button> <span id="voiceTranscript"></span>
+    </div>
+    <div id="searchPanel" class="code-mode-ui" style="display:none;">
+      <input type="text" id="searchQuery" placeholder="Search the web...">
+      <button onclick="App.webSearch()">Search</button>
+    </div>
+    <div id="cybersecPanel" class="code-mode-ui" style="display:none;">
+      <button onclick="App.loadCybersecCourses()">📚 Load Courses</button>
+      <div id="cybersecContent" style="margin-top:10px; max-height:400px; overflow-y:auto;"></div>
+    </div>
+    <!-- Message search bar -->
+    <div id="msgSearchBar" class="code-mode-ui" style="display:flex; align-items:center; gap:4px; padding:4px 8px; background:#0f172a;">
+      <input type="text" id="msgSearch" placeholder="Search messages..." oninput="UI.searchMessages()">
+    </div>
 
-    <!-- CHAT AREA (FIXED ID: reply) -->
+    <!-- Chat Area -->
     <div id="reply" class="chat-area">
       <div id="welcomeScreen" class="welcome">
-        <h1>🖥️ AgentOS AI v35</h1>
-        <p>Reliable Vision · No API Key · All Features</p>
+        <h1>🖥️ AgentOS AI v1</h1>
+        <p>AI that remembers, creates, and assists</p>
       </div>
+      <!-- Loading skeleton -->
     </div>
 
-    <!-- STATUS BAR -->
+    <!-- Status Bar -->
     <div class="status-bar">
       <div id="activeModel" class="active-chip">GPT-4o</div>
       <div id="activeTool" class="active-chip">No Tool</div>
       <div id="currentDateTime" class="active-chip" style="background:#2563eb;"></div>
       <div id="shieldStatus" class="active-chip" style="background:#10b981;">🛡️ Protected</div>
-      <button class="active-chip" onclick="toggleVoice()" id="speechBtn">🔊</button>
+      <button class="active-chip" onclick="Voice.toggleVoice()" id="speechBtn">🔊</button>
     </div>
 
-    <!-- MODEL ROW -->
+    <!-- Model Row (with data-model) -->
     <div class="model-row">
-      <button class="model-chip active-model" onclick="selectModel('GPT-4o',this)">🧠 GPT-4o</button>
-      <button class="model-chip" onclick="selectModel('Claude 3.5',this)">🎭 Claude</button>
-      <button class="model-chip" onclick="selectModel('Gemini 1.5 Pro',this)">🌌 Gemini</button>
-      <button class="model-chip" onclick="selectModel('Grok-2',this)">🕶️ Grok</button>
-      <button class="model-chip" onclick="selectModel('Perplexity',this)">🌐 Perplexity</button>
-      <button class="model-chip" onclick="selectModel('Cohere',this)">🔗 Cohere</button>
-      <button class="model-chip" onclick="selectModel('Bedrock',this)">☁️ Bedrock</button>
-      <button class="model-chip" onclick="selectModel('Mistral Large',this)">🌪️ Mistral</button>
-      <button class="model-chip" onclick="selectModel('Copilot',this)">🤝 Copilot</button>
-      <button class="model-chip" onclick="selectModel('Llama 3',this)">🦙 Llama</button>
-      <button class="model-chip" onclick="selectModel('DeepSeek',this)">🐋 DeepSeek</button>
-      <button class="model-chip" onclick="selectModel('Sonar 2',this)">📡 Sonar 2</button>
+      <button class="model-chip active-model" data-model="GPT-4o" onclick="App.selectModel('GPT-4o',this)">🧠 GPT-4o</button>
+      <button class="model-chip" data-model="Claude 3.5" onclick="App.selectModel('Claude 3.5',this)">🎭 Claude</button>
+      <button class="model-chip" data-model="Gemini 2.0 Flash" onclick="App.selectModel('Gemini 2.0 Flash',this)">🌌 Gemini</button>
+      <button class="model-chip" data-model="DeepSeek" onclick="App.selectModel('DeepSeek',this)">🐋 DeepSeek</button>
+      <button class="model-chip" data-model="Llama 3" onclick="App.selectModel('Llama 3',this)">🦙 Llama</button>
     </div>
 
-    <!-- TOOL ROW -->
+    <!-- Tool Row (with data-tool) -->
     <div class="tool-row">
-      <button class="tool-btn" onclick="selectTool('Thinking',this)">🧠</button>
-      <button class="tool-btn" onclick="selectTool('Web Search',this)">🌐</button>
-      <button class="tool-btn" onclick="selectTool('Deep Research',this)">🔍</button>
-      <button class="tool-btn" onclick="selectTool('Create Image',this)">🎨</button>
-      <button class="tool-btn" onclick="selectTool('Create Video',this)">🎥</button>
-      <button class="tool-btn" onclick="selectTool('Create Music',this)">🎵</button>
-      <button class="tool-btn" onclick="selectTool('Canvas',this)">📄</button>
-      <button class="tool-btn" onclick="selectTool('Tasks',this)">📅</button>
-      <button class="tool-btn" onclick="openAttachmentMenu()">➕</button>
+      <button class="tool-btn" data-tool="Thinking" onclick="App.selectTool('Thinking',this)">🧠</button>
+      <button class="tool-btn" data-tool="Web Search" onclick="App.selectTool('Web Search',this)">🌐</button>
+      <button class="tool-btn" data-tool="Image Generation" onclick="App.selectTool('Image Generation',this)">🎨</button>
+      <button class="tool-btn" data-tool="Voice" onclick="App.selectTool('Voice',this)">🎤</button>
+      <button class="tool-btn" onclick="UI.openAttachmentMenu()">➕</button>
     </div>
 
-    <!-- ATTACHMENT PREVIEW -->
+    <!-- Attachment Preview -->
     <div id="attachmentPreview" class="attachment-preview-strip"></div>
 
-    <!-- INPUT BAR -->
+    <!-- Input Bar -->
     <div class="input-container">
-      <button class="voice-btn" onclick="startVoice()">🎤</button>
+      <button class="voice-btn" onclick="Voice.startListening()">🎤</button>
       <input type="text" id="msg" placeholder="Message AgentOS AI...">
-      <button id="stopBtn" class="stop-btn" onclick="stopGeneration()">■</button>
-      <button class="send-btn" onclick="sendMessage()">➤</button>
+      <button id="stopBtn" class="stop-btn" onclick="Chat.stopGeneration()">■</button>
+      <button class="send-btn" onclick="App.sendMessage()">➤</button>
     </div>
   </div>
 
@@ -153,48 +159,126 @@
   <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
   <input type="file" id="galleryInput" accept="image/*" multiple hidden>
   <input type="file" id="fileInput" hidden>
-  <input type="file" id="importInput" accept=".json" hidden>
-  <input type="file" id="videoInput" accept="video/*" hidden>
-  <input type="file" id="faceInput" accept="image/*" multiple hidden>
+  <input type="file" id="importInput" accept=".json" hidden onchange="Chat.handleImport(event)">
 
   <!-- ATTACHMENT MENU -->
   <div id="attachmentMenu" class="attachment-menu">
     <div class="attachment-content"><h2>Tools</h2>
-      <div class="attachment-item" onclick="openCamera()">📷 Camera</div>
-      <div class="attachment-item" onclick="openGallery()">🖼 Gallery</div>
-      <div class="attachment-item" onclick="openFiles()">📁 File Upload</div>
-      <div class="attachment-item" onclick="openFaceSearch()">🔍 Face Search</div>
-      <div class="attachment-item" onclick="exportChats()">💾 Export</div>
-      <div class="attachment-item" onclick="importChats()">📥 Import</div>
-      <div class="attachment-item" onclick="closeAttachmentMenu()">❌ Close</div>
+      <div class="attachment-item" onclick="Attachments.openCamera()">📷 Camera</div>
+      <div class="attachment-item" onclick="Attachments.openGallery()">🖼 Gallery</div>
+      <div class="attachment-item" onclick="Attachments.openFiles()">📁 File Upload</div>
+      <div class="attachment-item" onclick="Chat.exportChats()">💾 Export</div>
+      <div class="attachment-item" onclick="Chat.importChats()">📥 Import</div>
+      <div class="attachment-item" onclick="UI.closeAttachmentMenu()">❌ Close</div>
     </div>
   </div>
 
   <!-- CHAT CONTEXT MENU -->
-  <div id="chatMenu" class="chat-menu"><div onclick="pinChat()">📌 Pin</div><div onclick="renameChat()">✏ Rename</div><div onclick="deleteChat()">🗑 Delete</div></div>
+  <div id="chatMenu" class="chat-menu">
+    <div onclick="UI.pinChat()">📌 Pin</div>
+    <div onclick="UI.renameChat()">✏ Rename</div>
+    <div onclick="UI.deleteChat()">🗑 Delete</div>
+  </div>
   <div id="typingIndicator" class="typing-indicator" style="display:none;"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
 
-  <!-- LOGIN MODAL -->
+  <!-- MODALS -->
+  <!-- Login Modal -->
   <div id="loginModal" class="modal-overlay hidden">
     <div class="modal-container">
-      <button class="modal-close" onclick="closeLoginModal()">✕</button>
+      <button class="modal-close" onclick="UI.closeLoginModal()">✕</button>
       <h2>Login / Register</h2>
       <input type="email" id="loginEmail" placeholder="Email">
       <input type="password" id="loginPassword" placeholder="Password">
       <input type="text" id="loginName" placeholder="Name (for register)">
-      <button class="btn-primary" onclick="doLogin()">Login</button>
-      <button class="btn-secondary" onclick="doRegister()">Register</button>
+      <button class="btn-primary" onclick="Auth.doLogin()">Login</button>
+      <button class="btn-secondary" onclick="Auth.doRegister()">Register</button>
+      <hr>
+      <a href="#" onclick="UI.showForgotPassword()">Forgot password?</a>
+      <hr>
+      <a href="#" onclick="UI.showVerifyEmail()">Verify Email</a>
     </div>
   </div>
 
-  <script>
-    // Fallback if app.js fails to load
-    window.addEventListener('error', function(e) {
-      if (e.target.tagName === 'SCRIPT') {
-        alert('Failed to load app.js. Please check the console for details.');
-      }
-    }, true);
-  </script>
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal-overlay hidden">
+    <div class="modal-container">
+      <button class="modal-close" onclick="UI.closeSettingsModal()">✕</button>
+      <h2>Settings</h2>
+      <label>Theme</label>
+      <select id="settingTheme" onchange="Settings.update('theme', this.value)">
+        <option value="dark">Dark</option><option value="light">Light</option>
+      </select>
+      <label>Language</label>
+      <select id="settingLanguage" onchange="Settings.update('language', this.value)"></select>
+      <label>Voice</label>
+      <select id="settingVoice" onchange="Settings.update('speech_active', this.value)">
+        <option value="1">On</option><option value="0">Off</option>
+      </select>
+      <label>Memory</label>
+      <select id="settingMemory" onchange="Settings.update('memory_enabled', this.value)">
+        <option value="1">On</option><option value="0">Off</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Memory Panel Modal -->
+  <div id="memoryModal" class="modal-overlay hidden">
+    <div class="modal-container">
+      <button class="modal-close" onclick="UI.closeMemoryPanel()">✕</button>
+      <h2>My Memory</h2>
+      <input type="text" id="memoryKey" placeholder="Key"><br>
+      <input type="text" id="memoryValue" placeholder="Value"><br>
+      <button onclick="Memory.addMemory()">Save</button>
+      <div id="memoryList"></div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal-overlay hidden">
+    <div class="modal-container">
+      <button class="modal-close" onclick="UI.closeProfileModal()">✕</button>
+      <h2>Profile</h2>
+      <div style="text-align:center; margin-bottom:12px;">
+        <img id="profileAvatar" src="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;background:#2563eb; display:none;" onerror="this.style.display='none'">
+        <div id="profileAvatarFallback" style="width:80px;height:80px;border-radius:50%;background:#2563eb;color:white;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto;"></div>
+      </div>
+      <input type="text" id="profileName" placeholder="Your name">
+      <input type="text" id="profileAvatarUrl" placeholder="Avatar URL (optional)">
+      <button onclick="Profile.save()">Save</button>
+    </div>
+  </div>
+
+  <!-- Rename Chat Modal -->
+  <div id="renameModal" class="modal-overlay hidden">
+    <div class="modal-container">
+      <button class="modal-close" onclick="UI.closeRenameModal()">✕</button>
+      <h2>Rename Chat</h2>
+      <input type="text" id="renameInput" placeholder="New chat title">
+      <button onclick="UI.submitRename()">Save</button>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgotModal" class="modal-overlay hidden">
+    <div class="modal-container">
+      <button class="modal-close" onclick="UI.closeForgotModal()">✕</button>
+      <h2>Forgot Password</h2>
+      <input type="email" id="forgotEmail" placeholder="Your email">
+      <button onclick="Auth.forgotPassword()">Send Reset Link</button>
+    </div>
+  </div>
+
+  <!-- Verify Email Modal -->
+  <div id="verifyModal" class="modal-overlay hidden">
+    <div class="modal-container">
+      <button class="modal-close" onclick="UI.closeVerifyModal()">✕</button>
+      <h2>Verify Email</h2>
+      <input type="email" id="verifyEmail" placeholder="Your email">
+      <input type="text" id="verifyCode" placeholder="Verification code">
+      <button onclick="Auth.verifyEmail()">Verify</button>
+    </div>
+  </div>
+
   <script src="/static/app.js"></script>
 </body>
 </html>
