@@ -102,9 +102,7 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_messages_chat ON messages(chat_id);
         CREATE INDEX IF NOT EXISTS idx_memory_user ON memory(user_email);
     """)
-    conn.execute("DELETE FROM password_resets WHERE expires_at < datetime('now')")
-conn.commit()
-conn.close()
+    
 # ========================= FastAPI App =========================
 app = FastAPI(title="AgentOS AI 2.0", version="2.0")
 
