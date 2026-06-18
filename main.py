@@ -433,12 +433,34 @@ class ChatStreamRequest(BaseModel):
     mode: Optional[str] = "chat"
 
 MODEL_MAP = {
-    "GPT-4o": "openai/gpt-4o", "Claude 3.5": "anthropic/claude-sonnet-4-20250514",
-    "Gemini 2.0 Flash": "google/gemini-2.0-flash", "DeepSeek": "deepseek/deepseek-chat",
-    "Llama 3": "meta-llama/llama-3.3-70b-instruct", "Grok-2": "x-ai/grok-2",
-    "Perplexity": "perplexity/llama-3.1-sonar-large-128k-online", "Cohere": "cohere/command-r-plus",
-    "Bedrock": "anthropic/claude-sonnet-4-20250514", "Mistral Large": "mistralai/mistral-large",
-    "Copilot": "microsoft/copilot", "Sonar 2": "perplexity/sonar-reasoning"
+    "GPT-4o": "openai/gpt-4o-mini",
+
+    "Claude": "anthropic/claude-sonnet-4-20250514",
+    "Claude 3.5": "anthropic/claude-sonnet-4-20250514",
+
+    "Gemini": "google/gemini-2.0-flash",
+    "Gemini 2.0 Flash": "google/gemini-2.0-flash",
+
+    "DeepSeek": "deepseek/deepseek-chat",
+
+    "Llama": "meta-llama/llama-3.3-70b-instruct",
+    "Llama 3": "meta-llama/llama-3.3-70b-instruct",
+
+    "Grok": "x-ai/grok-2",
+    "Grok-2": "x-ai/grok-2",
+
+    "Perplexity": "perplexity/llama-3.1-sonar-large-128k-online",
+
+    "Cohere": "cohere/command-r-plus",
+
+    "Bedrock": "anthropic/claude-sonnet-4-20250514",
+
+    "Mistral": "mistralai/mistral-large",
+    "Mistral Large": "mistralai/mistral-large",
+
+    "Copilot": "microsoft/copilot",
+
+    "Sonar 2": "perplexity/sonar-reasoning"
 }
 
 async def stream_gemini(messages):
@@ -527,7 +549,7 @@ async def stream_chat(request: Request, req: ChatStreamRequest, current_user=Dep
 
     async def generate():
         acc = ""
-        s = stream_gemini(messages) if model=="Gemini 2.0 Flash" and GEMINI_API_KEY else stream_openrouter(messages, model, current_user["email"])
+        s = stream_gemini(messages) if model in ["Gemini", "Gemini 2.0 Flash"] and GEMINI_API_KEY else stream_openrouter(messages, model, current_user["email"])
         async for chunk in s:
             if chunk.startswith("data: [DONE]"): break
             yield chunk
