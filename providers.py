@@ -20029,8 +20029,8 @@ from email.mime.text import MIMEText
 
 # .env
 
-RESEND_API_KEY=your_resend_api_key
-EMAIL_FROM=noreply@agentos-ai.in
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
+EMAIL_FROM = os.getenv("EMAIL_FROM", "noreply@agentos-ai.in")
 
 # ============================================================
 # USER MODEL ADDITIONS
@@ -20371,13 +20371,13 @@ user = User(
 
 # after commit
 
-await EmailService.send_verification_email(
+# await EmailService.send_verification_email(
 
-    user.email,
+#     user.email,
 
-    verification_token
+#     verification_token
 
-)
+# )
 
 # ============================================================
 # OPTIONAL LOGIN BLOCK
@@ -20750,12 +20750,12 @@ if not validate_password_strength(
 # AUDIT LOGGING
 # ============================================================
 
-await founder_audit_log(
-    db,
-    user.id,
-    "password_reset",
-    f"Password reset for {user.email}"
-)
+# await founder_audit_log(
+#     db,
+#     user.id,
+#     "password_reset",
+#     f"Password reset for {user.email}"
+# )
 
 # Better option:
 
@@ -27103,11 +27103,11 @@ Upgrade plan to continue.
 # Example usage inside chat endpoint
 
 """
-await enforce_limit(
-    current_user,
-    "messages",
-    db
-)
+# await enforce_limit(
+#     current_user,
+#     "messages",
+#     db
+# )
 """
 
 # ============================================================
@@ -27115,11 +27115,11 @@ await enforce_limit(
 # ============================================================
 
 """
-await enforce_limit(
-    current_user,
-    "research",
-    db
-)
+# await enforce_limit(
+#     current_user,
+#     "research",
+#     db
+# )
 """
 
 # ============================================================
@@ -27127,11 +27127,11 @@ await enforce_limit(
 # ============================================================
 
 """
-await enforce_limit(
-    current_user,
-    "image",
-    db
-)
+# await enforce_limit(
+#     current_user,
+#     "image",
+#     db
+# )
 """
 
 # ============================================================
@@ -27139,11 +27139,11 @@ await enforce_limit(
 # ============================================================
 
 """
-await enforce_limit(
-    current_user,
-    "video",
-    db
-)
+# await enforce_limit(
+#     current_user,
+#     "video",
+#     db
+# )
 """
 
 # ============================================================
@@ -27151,11 +27151,11 @@ await enforce_limit(
 # ============================================================
 
 """
-await enforce_limit(
-    current_user,
-    "multi_agent",
-    db
-)
+# await enforce_limit(
+#     current_user,
+#     "multi_agent",
+#     db
+# )
 """
 
 # ============================================================
@@ -27163,11 +27163,11 @@ await enforce_limit(
 # ============================================================
 
 """
-await enforce_limit(
-    current_user,
-    "autonomous",
-    db
-)
+# await enforce_limit(
+#     current_user,
+#     "autonomous",
+#     db
+# )
 """
 
 # ============================================================
